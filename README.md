@@ -17,9 +17,9 @@ To create a new template for documentation simply run:
 
 **NOTE**: To use the default REVSYS theme you will need to install [hugo](https://gohugo.io/) which for OSX is typically done with a simple `brew install hugo`
 
-To upload docs, finish editing your content in the directory you created (typically `./docs/`) and then run:
+To upload docs, finish editing your content, generate it and then run:
 
-    rsdoc upload ./docs/
+    rsdoc upload ./path/to/generated/content/
 
 So the typically workflow becomes:
 
