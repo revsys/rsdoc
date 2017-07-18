@@ -17,7 +17,7 @@ To create a new template for documentation simply run:
 
 **NOTE**: To use the default REVSYS theme you will need to install [hugo](https://gohugo.io/) which for OSX is typically done with a simple `brew install hugo`
 
-To upload docs, simply finished editing your content in the directory you created (typically `./docs/`) and then run:
+To upload docs, finish editing your content in the directory you created (typically `./docs/`) and then run:
 
     rsdoc upload ./docs/
 
@@ -27,7 +27,7 @@ So the typically workflow becomes:
 1. Edit your docs in `./docs/` using `hugo server` locally to verify everything is working correctly.
 1. cd into `./docs/` and run `hugo build`
 1. hugo will create a `public/` directory relative to your current path with the built files.
-1. To upload these simply run `rsdoc upload ./public/`
+1. To upload these run `rsdoc upload ./public/`
 
 Assuming your `.rsdoc` settings are correct this will tar up the contents of the hugo generated folder and deploy them via REST to docs.revsys.com
 
