@@ -2,7 +2,6 @@ import click
 import glob
 import os
 import requests
-import subprocess
 import tarfile
 import tempfile
 import warnings
