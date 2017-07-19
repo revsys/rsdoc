@@ -123,3 +123,29 @@ def create(cookiecutter_repo_url):
     click.secho('Running cookiecutter, it will ask you some questions:', fg='green')
     cookiecutter(cookiecutter_repo_url)
     click.secho('Cookiecutter creation finished!', fg='green')
+
+
+@cli.command()
+def init():
+    """ Generate a .rsdoc file based on commandline options or prompts """
+    if os.path.exists('./.rsdoc'):
+        click.secho("ERROR: .rsdoc already exists, remove it or edit it yourself", fg='red')
+        raise click.Abort()
+
+    click.secho("Generating a new .rsdoc file, but we need some info from you:", fg='green')
+    path = click.prompt('The docset path', type=str)
+    version = click.prompt('The docset version', type=str)
+    token = click.prompt('The docset upload token', type=str)
+
+    with open('./.rsdoc', 'w') as f:
+        f.write("""RSDOC_PATH="{}"\n""".format(path))
+        f.write("""RSDOC_VERSION="{}"\n""".format(version))
+        f.write("""RSDOC_TOKEN="{}"\n""".format(token))
+
+    click.secho("\n.rsdoc file generated, it's contents are:\n", fg='green')
+
+    f = open('./.rsdoc')
+    for line in f:
+        print(line.strip())
+
+    click.secho("\nDONE", fg='green')
