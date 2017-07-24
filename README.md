@@ -43,6 +43,24 @@ RSDOC_TOKEN="<Your DocSet Token>"
 
 These will come from the DocSet model and associated upload Token defined in the system.
 
+## Client, Group, and User management
+
+If you're an admin user of docs.revsys.com you can get and set your API Token in `~/.rsdoc` like this:
+
+```
+RSDOC_API_TOKEN="my-token-info"
+```
+
+This will allow you to interact with the docs API to manage clients, groups, and putting users into clients and groups.
+
+### rsdoc client usage
+
+To list clients run:
+
+```
+rsdoc client --ls
+```
+
 ## Questions?
 
 Contact Frank

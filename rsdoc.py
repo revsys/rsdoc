@@ -15,7 +15,7 @@ with warnings.catch_warnings():
     env.read_envfile('.rsdoc')
 
 
-def handle_option_precendence(path, version, token):
+def upload_option_precendence(path, version, token):
     final_path = path
     final_version = version
     final_token = token
@@ -47,6 +47,17 @@ def handle_option_precendence(path, version, token):
     return final_path, final_version, final_token
 
 
+def api_path(base_url, path):
+    """ Build the API URL with base + path """
+    if base_url.endswith('/'):
+        base_url = base_url[:-1]
+
+    if path.startswith('/'):
+        path = path[1:]
+
+    return "{}/{}".format(base_url, path)
+
+
 @click.group()
 @click.pass_context
 def cli(ctx):
@@ -58,12 +69,13 @@ def cli(ctx):
 @click.option('--path', default=None, help='DocSet Path')
 @click.option('--version', default=None, help='DocSet Version String')
 @click.option('--token', default=None, help='DocSet Token')
+@click.option('--api-url', default='https://docs.revsys.com', help='Base API Endpoint')
 @click.argument('directory', type=click.Path(exists=True))
-def upload(path, version, token, directory):
+def upload(path, version, token, directory, api_url):
     """ Create and upload docs to docs.revsys.com """
 
     # Can set these values
-    path, version, token = handle_option_precendence(path, version, token)
+    path, version, token = upload_option_precendence(path, version, token)
 
     # Make tarfile in a temp file
     tmpfile = tempfile.NamedTemporaryFile(delete=False)
@@ -149,3 +161,112 @@ def init():
         print(line.strip())
 
     click.secho("\nDONE", fg='green')
+
+
+######################################################################
+# Admin only related functions
+######################################################################
+def get_auth_token():
+    """ Get admin API token or abort """
+    token = env('RSDOC_API_TOKEN', None)
+
+    home_path = os.path.expanduser('~/.rsdoc')
+
+    if token is None and os.path.exists(home_path):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            env.read_envfile(home_path)
+            token = env('RSDOC_API_TOKEN', None)
+
+    if token is None:
+        click.secho('ERROR: Cannot find your admin API token in RSDOC_API_TOKEN, please set it in the environment or in ~/.rsdoc')
+        raise click.Abort()
+
+    return token
+
+
+def api(url, token, data=None, method="GET"):
+    if method == "GET":
+        r = requests.get(
+            url,
+            headers={'Authorization': 'Token {}'.format(token)}
+        )
+
+        if r.status_code != 200:
+            click.secho('ERROR: API Returned Status {}'.format(r.status_code), fg='red')
+            click.secho(r.content)
+            raise click.Abort()
+
+    else:
+        r = requests.post(
+            url,
+            data=data,
+            headers={'Authorization': 'Token {}'.format(token)}
+        )
+
+        if r.status_code < 200 or r.status_code >= 300:
+            click.secho('ERROR: API Returned Status {}'.format(r.status_code), fg='red')
+            click.secho(str(r.json()))
+            raise click.Abort()
+
+    return r
+
+
+def list_clients(base_url, token):
+    """ Retrieve existing clients from the API """
+    r = api(api_path(base_url, '/api/v1/clients/?page_size=500'), token)
+    data = r.json()
+    click.secho("{:<40}  Name".format('Client Slug'), fg='green')
+
+    for item in data['results']:
+        click.echo("{:<40}  {}".format(item['slug'], item['name']))
+
+    click.secho("DONE", fg='green')
+
+
+def create_client(base_url, token):
+    """ Create a new client if it doesn't exist, prompting for slug and name """
+    click.secho('Creating new Client...', fg='green')
+    slug = click.prompt('New slug')
+    name = click.prompt('Display Name')
+    data = {
+        'slug': slug,
+        'name': name,
+    }
+
+    click.secho('Calling API...', fg='green')
+
+    r = api(api_path(base_url, '/api/v1/clients/'), token, data=data, method="POST")
+    import pprint
+    pprint.pprint(r.json())
+    click.secho('Client Created', fg='green')
+
+
+@cli.command()
+@click.option('--create', is_flag=True, help="Create new client")
+@click.option('--add', default=None, help="Add user to Client")
+@click.option('--ls', is_flag=True, help="List clients")
+@click.option('--api-url', default='https://docs.revsys.com', help='API Base URL')
+def client(create, add, ls, api_url):
+    """ Manage clients """
+    token = get_auth_token()
+
+    if not any([create, add, ls]):
+        click.secho("Manage clients")
+        click.secho("  --create will create a new client")
+        click.secho("  --add will add a user to a client")
+        click.secho("  --ls lists all clients")
+        return
+
+    if ls is True:
+        list_clients(api_url, token)
+        return
+
+    if create is True:
+        create_client(api_url, token)
+        return
+
+    if add:
+        print("Add a user {}".format(add))
+        return
+
