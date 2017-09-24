@@ -69,13 +69,14 @@ def cli(ctx):
 @click.option('--path', default=None, help='DocSet Path')
 @click.option('--version', default=None, help='DocSet Version String')
 @click.option('--token', default=None, help='DocSet Token')
-@click.option('--api-url', default='https://docs.revsys.com', help='Base API Endpoint')
 @click.argument('directory', type=click.Path(exists=True))
-def upload(path, version, token, directory, api_url):
+def upload(path, version, token, directory):
     """ Create and upload docs to docs.revsys.com """
 
     # Can set these values
     path, version, token = upload_option_precendence(path, version, token)
+
+    click.secho('Making doc archive...', fg='green', nl=False)
 
     # Make tarfile in a temp file
     tmpfile = tempfile.NamedTemporaryFile(delete=False)
@@ -91,8 +92,10 @@ def upload(path, version, token, directory, api_url):
 
     tmpfile.close()
 
+    click.secho('done.', fg='green')
+
     # Upload it to the API
-    api_base = 'http://localhost/api/v1/upload'
+    api_base = 'https://docs.revsys.com/api/v1/upload'
     filename = "{path}-{version}-{random}.tar.gz".format(
         path=path,
         version=version,
@@ -108,11 +111,14 @@ def upload(path, version, token, directory, api_url):
 
     fp = open(tmpfile.name, 'rb')
 
+    click.secho("Uploading archive to docs.revsys.com...", fg='green', nl=False)
+
     r = requests.post(
         url=url,
         files={'file': fp},
         headers={'Authorization': 'Token {}'.format(token)}
     )
+    click.secho("done. ", fg='green')
 
     fp.close()
     os.unlink(tmpfile.name)

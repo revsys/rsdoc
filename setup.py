@@ -6,7 +6,7 @@ setup(
     py_modules=['rsdoc'],
     install_requires=[
         'Click>=6.7',
-        'requests>=2.18.1',
+        'requests>=2.18.4',
         'cookiecutter>=1.5.1',
         'envparse>=0.2.0',
     ],
