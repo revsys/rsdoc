@@ -56,7 +56,7 @@ So the typically workflow becomes:
 1. To upload these run `rsdoc upload ./public/`.
 1. To view your newly uploaded docs live just run `rsdoc open`
 
-Assuming your `.rsdoc.json` settings are correct this will tar up the contents of the hugo generated folder and deploy them via REST to docs.revsys.com
+Assuming your `.rsdoc.json` settings are correct this will tar up the contents of the hugo generated folder and deploy them via REST to [docs.revsys.com](https://docs.revsys.com/)
 
 ### Open the docs
 
