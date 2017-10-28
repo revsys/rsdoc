@@ -48,11 +48,13 @@ To upload docs, finish editing your content, generate it and then run:
 
 So the typically workflow becomes:
 
-1. Create docs skeleton using Cookiecutter via `rsdoc create`
+1. Create docs skeleton using Cookiecutter via `rsdoc create`.
+1. Configure your DocSet by running `rsdoc init`.  This will prompt you for the DocSet Path, Version, and upload Token and put them in `./.rsdoc.json` for you.
 1. Edit your docs in `./docs/` using `hugo server` locally to verify everything is working correctly.
-1. cd into `./docs/` and run `hugo build`
+1. cd into `./docs/` and run `hugo build`.
 1. hugo will create a `public/` directory relative to your current path with the built files.
-1. To upload these run `rsdoc upload ./public/`
+1. To upload these run `rsdoc upload ./public/`.
+1. To view your newly uploaded docs live just run `rsdoc open`
 
 Assuming your `.rsdoc.json` settings are correct this will tar up the contents of the hugo generated folder and deploy them via REST to docs.revsys.com
 
@@ -103,7 +105,7 @@ To build this you will need Go 1.9+ and the following dependencies:
 Then it's just a simple matter of: 
 
 `go build main.go`
- 
+
 ## Questions?
 
 Contact Frank
