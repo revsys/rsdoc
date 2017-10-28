@@ -85,7 +85,18 @@ def upload(path, version, token, directory):
 
         old_cwd = os.getcwd()
         os.chdir(directory)
-        for filename in glob.iglob('*'):
+        for filename in glob.iglob('**/*.html', recursive=True):
+            if filename.startswith('revealjs'):
+                continue
+            click.secho("Adding {}".format(filename))
+            tar.add(filename, recursive=True)
+
+        for filename in glob.iglob('*.xml', recursive=True):
+            click.secho("Adding {}".format(filename))
+            tar.add(filename, recursive=True)
+
+        for filename in glob.iglob('*.json', recursive=True):
+            click.secho("Adding {}".format(filename))
             tar.add(filename, recursive=True)
 
         os.chdir(old_cwd)
